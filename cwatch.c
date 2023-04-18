@@ -12,6 +12,7 @@ Create first public release */
 #include <stdlib.h>
 #include <getopt.h>
 #include <string.h>
+#include <argp.h>
 
 static int e_cur;
 static int e_tot;
@@ -19,74 +20,108 @@ static int e_tot;
 char c;
 static char logdir[128];
 
-void arg_parse () {
-    // add flags for functions
-    // v,g,h,s,t,T
+static int
+parse_opt (int key, char *arg, struct argp_state *state)
+{
+  switch (key)
+  {
+  case 't': printf(".\n"); break;
+  case 'T': printf(".\n"); break;
+  case 'p': printf(".\n"); break;
+  case 'g': printf(".\n"); break;
+  }
+  return 0;
+  // add flags for functions
+  // v,g,h,s,t,T
 }
 
-int get_logdir () {
-    FILE *fpipe;
-    char buf[128];
-    char cmd[] = "portageq envvar EMERGE_LOG_DIR";
-    
-    if (0 == (fpipe = (FILE*)popen (cmd, "r"))) {
-        perror ("popen() failed.");
-        exit (EXIT_FAILURE);
+int
+get_logdir ()
+{
+  FILE *fpipe;
+  char buf[128];
+  char cmd[] = "portageq envvar EMERGE_LOG_DIR";
+
+  if (0 == (fpipe = (FILE *) popen (cmd, "r")))
+    {
+      perror ("popen() failed.");
+      exit (EXIT_FAILURE);
     }
 
-    fread (&buf, sizeof buf, 128, fpipe);
-    
-    pclose (fpipe);
+  fread (&buf, sizeof buf, 128, fpipe);
 
-    if (buf[0] != '\0')
-        strcpy(logdir, buf);
-    else
-        exit (EXIT_FAILURE);
-        // temporary, option will be enabled soon
+  pclose (fpipe);
 
-    puts(logdir);
+  if (buf[0] != '\0')
+    strcpy (logdir, buf);
+  else
+    exit (EXIT_FAILURE);
+  // temporary, option will be enabled soon
 
-    return EXIT_SUCCESS;
+  puts (logdir);
+
+  return EXIT_SUCCESS;
 }
 
-void read_char () {
-    if ((c = getchar ()) == EOF) exit(EXIT_FAILURE);
+void
+read_char ()
+{
+  if ((c = getchar ()) == EOF)
+    exit (EXIT_FAILURE);
 }
 
-static void log_parse () {
-    // fstream reverse read
-    // pattern match ">>> emerge"
-    // awk 2 fields: [1] of [3]
-    //
-    // parse popen() commands >>> static var e_cur / e_tot
-    //
-    // cat /var/log/portage/emerge.log  | grep -w ">>> emerge" | awk '{print $4}'
-    // cat /var/log/portage/emerge.log  | grep -w ">>> emerge" | awk '{print $6}'
+static void
+log_parse ()
+{
+  // fstream reverse read
+  // pattern match ">>> emerge"
+  // awk 2 fields: [1] of [3]
+  //
+  // parse popen() commands >>> static var e_cur / e_tot
+  //
+  // cat /var/log/portage/emerge.log  | grep -w ">>> emerge" | awk '{print $4}'
+  // cat /var/log/portage/emerge.log  | grep -w ">>> emerge" | awk '{print $6}'
 }
 
-int main () {
-    /*
-    int i, match = 0;
-    char str[] = "insects";
+int
+main (int argc, char **argv)
+{
+  struct argp_option options[] =
+  {
+    { "prevtime", 't', 0, 0, "Print the last build time for <pkg>" },
+    { "avgtime", 'T', 0, 0, "Calculate the avg build time for <pkg>" },
+    { "pkg-history", 'p', 0, 0, "Fetch emerge history for <pkg>" },
+    { "global-history", 'g', 0, 0, "Fetch global emerge history" },
+    { 0 }
+  };
+  struct argp argp = { options, parse_opt, 0, 0 };
+  return argp_parse (&argp, argc, argv, 0, 0, 0);
 
-    read_char ();
-    for (i=0; str[i] != '\0'; i++) {
-        if (c == str[i]) {
-            match = 1;
-            putchar (c);
-            read_char ();
-        }
-        else if (match) {
-            match = 0;
-            i = -1;
-        }
-        else {
-            i= -1;
-            putchar (c);
-            read_char ();
-        }
-    }
-    */
-    get_logdir();
-    return 0;
+
+
+
+
+  /*
+     int i, match = 0;
+     char str[] = "insects";
+
+     read_char ();
+     for (i=0; str[i] != '\0'; i++) {
+     if (c == str[i]) {
+     match = 1;
+     putchar (c);
+     read_char ();
+     }
+     else if (match) {
+     match = 0;
+     i = -1;
+     }
+     else {
+     i= -1;
+     putchar (c);
+     read_char ();
+     }
+     }
+   */
+  return 0;
 }
