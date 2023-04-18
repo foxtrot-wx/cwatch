@@ -1,3 +1,10 @@
+/**** TO DO ****/
+
+/* Move repeatedly used functions / basic definitions to lib.h
+Populate functions
+Create first public release */
+
+
 /** includes **/
 #include "util.h"
 
@@ -12,7 +19,12 @@ static int e_tot;
 char c;
 static char logdir[128];
 
-int e_logdir () {
+void arg_parse () {
+    // add flags for functions
+    // v,g,h,s,t,T
+}
+
+int get_logdir () {
     FILE *fpipe;
     char buf[128];
     char cmd[] = "portageq envvar EMERGE_LOG_DIR";
@@ -75,6 +87,6 @@ int main () {
         }
     }
     */
-    e_logdir();
+    get_logdir();
     return 0;
 }
