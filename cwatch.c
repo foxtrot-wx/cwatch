@@ -4,43 +4,44 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
+#include <string.h>
 
 static int e_cur;
 static int e_tot;
 
 char c;
-
 static char logdir[128];
 
-int e_logdir() {
+int e_logdir () {
     FILE *fpipe;
     char buf[128];
     char cmd[] = "portageq envvar EMERGE_LOG_DIR";
     
-    if (0 == (fpipe = (FILE*)popen(cmd, "r")))
-    {
+    if (0 == (fpipe = (FILE*)popen (cmd, "r"))) {
         perror ("popen() failed.");
         exit (EXIT_FAILURE);
     }
 
-    fread(&buf, sizeof buf, 128, fpipe);
+    fread (&buf, sizeof buf, 128, fpipe);
     
-    /*
-    if (  &buf empty string  )
-        logdir = /var/log/portage/
+    pclose (fpipe);
+
+    if (buf[0] != '\0')
+        strcpy(logdir, buf);
     else
-        logdir = &buf
-    */
-    pclose(fpipe);
+        exit (EXIT_FAILURE);
+        // temporary, option will be enabled soon
+
+    puts(logdir);
 
     return EXIT_SUCCESS;
 }
 
-void read_char() {
-    if ((c = getchar()) == EOF) exit(EXIT_FAILURE);
+void read_char () {
+    if ((c = getchar ()) == EOF) exit(EXIT_FAILURE);
 }
 
-static void log_parse() {
+static void log_parse () {
     // fstream reverse read
     // pattern match ">>> emerge"
     // awk 2 fields: [1] of [3]
@@ -51,16 +52,17 @@ static void log_parse() {
     // cat /var/log/portage/emerge.log  | grep -w ">>> emerge" | awk '{print $6}'
 }
 
-int main() {
+int main () {
+    /*
     int i, match = 0;
     char str[] = "insects";
 
-    read_char();
+    read_char ();
     for (i=0; str[i] != '\0'; i++) {
         if (c == str[i]) {
             match = 1;
-            putchar(c);
-            read_char();
+            putchar (c);
+            read_char ();
         }
         else if (match) {
             match = 0;
@@ -68,11 +70,11 @@ int main() {
         }
         else {
             i= -1;
-            putchar(c);
-            read_char();
+            putchar (c);
+            read_char ();
         }
     }
-
-
+    */
+    e_logdir();
     return 0;
 }
