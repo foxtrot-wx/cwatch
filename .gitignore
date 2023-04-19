@@ -1,3 +1,4 @@
 cwatch
 cwatch.c~
 test.txt
+*.o
