@@ -24,11 +24,13 @@ static void prev_time ();
 static void avg_time ();
 static void pkg_hist ();
 static void global_hist ();
+static void pkg_mon ();
 
-static char c;
+// static char c;
 static char logdir[128];
 static char std_dir[] = "/var/log/portage";
-static char log_file[];
+
+// static char log_file[];
 
 // static int e_cur;
 // static int e_tot;
@@ -43,22 +45,27 @@ parse_opt (int key, char *arg, struct argp_state *state)
       {
 	prev_time ();
 	break;
-      };
+      }
     case 'T':
       {
 	avg_time ();
 	break;
-      };
+      }
     case 'p':
       {
 	pkg_hist ();
 	break;
-      };
+      }
     case 'g':
       {
 	global_hist ();
 	break;
-      };
+      }
+    case 'm':
+      {
+  pkg_mon ();
+  break;
+      }
     }
   return 0;
 }
@@ -134,17 +141,23 @@ global_hist ()
   printf ("global_hist [ok]\n");
 }
 
+pkg_mon ()
+{
+  printf ("pkg_mon [ok]\n");
+}
+
 int
 main (int argc, char **argv)
 {
   struct argp_option options[] = {
-    {"prevtime", 't', "<pkg>", 0, "Print the last build time for <pkg>"},
-    {"avgtime", 'T', "<pkg>", 0, "Calculate the avg build time for <pkg>"},
-    {"pkg-history", 'p', "<pkg>", 0, "Fetch emerge history for <pkg>"},
-    {"global-history", 'g', 0, 0, "Fetch global emerge history"},
+    {"prevtime", 't', "<pkg>", 0, "Print the last build time for <pkg>", 0},
+    {"avgtime", 'T', "<pkg>", 0, "Calculate the avg build time for <pkg>", 0},
+    {"pkg-history", 'p', "<pkg>", 0, "Fetch emerge history for <pkg>", 0},
+    {"global-history", 'g', 0, 0, "Fetch global emerge history", 0},
+    {"pkg-mon", 'm', 0, 0, "Monitor current emerge process", 0},
     {0}
   };
-  struct argp argp = { options, parse_opt, 0, 0 };
+  struct argp argp = { options, parse_opt, 0, 0, 0, 0, 0 };
   return argp_parse (&argp, argc, argv, 0, 0, 0);
 
 
