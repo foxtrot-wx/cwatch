@@ -28,13 +28,13 @@ static void pkg_mon ();
 
 // static char c;
 static char logdir[128];
-static char std_dir[] = "/var/log/portage";
+static char std_dir[] = "/var/log/portage/";
 
-// static char log_file[];
+static char pkg_query[32];
 
-// static int e_cur;
-// static int e_tot;
-// static int usr_dir;
+static int e_cur;
+static int e_tot;
+static int usr_dir;
 
 static int
 parse_opt (int key, char *arg, struct argp_state *state)
@@ -44,16 +44,19 @@ parse_opt (int key, char *arg, struct argp_state *state)
     case 't':
       {
 	prev_time ();
+	strncpy (pkg_query, arg, 32);
 	break;
       }
     case 'T':
       {
 	avg_time ();
+	strncpy (pkg_query, arg, 32);
 	break;
       }
     case 'p':
       {
 	pkg_hist ();
+	strncpy (pkg_query, arg, 32);
 	break;
       }
     case 'g':
@@ -63,8 +66,8 @@ parse_opt (int key, char *arg, struct argp_state *state)
       }
     case 'm':
       {
-  pkg_mon ();
-  break;
+	pkg_mon ();
+	break;
       }
     }
   return 0;
@@ -88,10 +91,10 @@ get_logdir ()
   pclose (fpipe);
 
   if (buf[0] != '\0')
-    strcpy (logdir, buf);
+    strncpy (logdir, buf, 128);
   // possible switch to strncpy()?
   else
-    strcpy (logdir, std_dir);
+    strncpy (logdir, std_dir, 128);
   // possible switch to strncpy()?
 
   puts (logdir);
@@ -139,6 +142,7 @@ pkg_hist ()
 global_hist ()
 {
   printf ("global_hist [ok]\n");
+  get_logdir ();
 }
 
 pkg_mon ()
@@ -159,7 +163,6 @@ main (int argc, char **argv)
   };
   struct argp argp = { options, parse_opt, 0, 0, 0, 0, 0 };
   return argp_parse (&argp, argc, argv, 0, 0, 0);
-
 
   /*
      int i, match = 0;
