@@ -28,6 +28,7 @@ static void global_hist ();
 static char c;
 static char logdir[128];
 static char std_dir[] = "/var/log/portage";
+static char log_file[];
 
 // static int e_cur;
 // static int e_tot;
@@ -81,10 +82,10 @@ get_logdir ()
 
   if (buf[0] != '\0')
     strcpy (logdir, buf);
-    // possible switch to strncpy()?
+  // possible switch to strncpy()?
   else
     strcpy (logdir, std_dir);
-    // possible switch to strncpy()?
+  // possible switch to strncpy()?
 
   puts (logdir);
 
